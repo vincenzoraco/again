@@ -97,6 +97,18 @@ it('throws when limitTo receives -5', function () {
         ->limitTo(-5);
 });
 
+it('prevents execute() from being called more than once', function () {
+    $again = Again::perform(function () {})
+        ->limitTo(3);
+
+    $again->execute();
+
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('execute() can only be called once per instance');
+
+    $again->execute();
+});
+
 it('allows to get the iterations reached', function () {
     $againAction = Again::perform(function () {})
         ->limitTo(3)
