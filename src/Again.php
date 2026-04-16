@@ -49,6 +49,12 @@ final class Again
 
     public function execute(): AgainStopReason
     {
+        if ($this->iteration > 0) {
+            throw new InvalidArgumentException(
+                'execute() can only be called once per instance'
+            );
+        }
+
         $action = $this->action;
         $condition = $this->condition;
 
