@@ -2,6 +2,10 @@
 
 A handy utility package that lets you write loops in a declarative way and avoid infinite loops.
 
+## Requirements
+
+- PHP 8.2 or higher
+
 ## Installing
 
 ```shell
@@ -25,21 +29,33 @@ properly defined. To prevent this, it is essential to add safeguards, such as li
 ### Introducing Again
 
 **Again** simplifies repetitive task execution with built-in safeguards to prevent infinite loops. It allows you to
-specify
-both a maximum number of iterations and a stopping condition, ensuring your loop behaves as expected.
+specify both a maximum number of iterations and a stopping condition, ensuring your loop behaves as expected.
 
 Here’s how **Again** can help:
 
 ```php
 Again::perform(fn(int $i) => $this->sendEmail())
-  ->limitTo(3)  // Stop after 3 attempts
-  ->until(fn(int $i) => !$this->isSent())  // Stop if email is sent
+  ->limitTo(3)                                    // Stop after 3 attempts
+  ->until(fn(int $i) => !$this->isSent())         // Keep going while email is not sent
   ->execute();
 ```
 
-In this example, the email sending will attempt up to **3 times** until `$this->isSent()` is `true`. If the condition
-isn't
-met after 3 attempts, the loop will automatically stop, preventing an endless loop.
+In this example, the email sending will attempt up to **3 times** while `$this->isSent()` is `false`. If the email is
+sent before the limit, the loop stops early. If it isn’t sent after 3 attempts, the loop will automatically stop,
+preventing an endless loop.
+
+### How `until()` works
+
+The `until()` closure uses **"while" semantics**: return `true` to keep iterating, `false` to stop. Think of it as
+"keep going while this condition holds":
+
+```php
+// Keep retrying while the job is still pending
+->until(fn(int $i) => $this->job->isPending())
+
+// Keep going while there are items left to process
+->until(fn(int $i) => $this->hasItemsLeft())
+```
 
 ### Example with Custom Logic
 
@@ -48,7 +64,7 @@ You can also define your loop behavior using more complex logic by passing custo
 ```php
 $action = Again::perform($actionLogic)
   ->limitTo($limit)  // Limit the number of iterations
-  ->until($until)  // Define the condition to stop
+  ->until($until)    // Keep going while condition returns true
   ->execute();
 ```
 
@@ -67,7 +83,7 @@ $stopReason = Again::perform($actionLogic)
 
 // Check the reason for stopping
 if ($stopReason === AgainStopReason::MAX_ITERATIONS_REACHED) {
-    $this->notifyToSlack('Maximum retries reached.');
+    $this->notifyToSlack(‘Maximum retries reached.’);
     // Handle the case when max iterations are reached
 }
 
@@ -80,8 +96,8 @@ if ($stopReason === AgainStopReason::CONDITION_MET) {
 
 - **Limit the number of iterations:** Use the `limitTo()` method to specify a maximum number of executions, preventing
   infinite loops.
-- **Custom stop condition:** Use the `until()` method to define the condition that will cause the loop to stop when it
-  evaluates to `true`.
+- **Custom stop condition:** Use the `until()` method to define a condition that keeps the loop running while it returns
+  `true`. The loop stops as soon as the condition returns `false`.
 - **Flexible execution:** Pass custom logic or actions to be executed on each iteration.
 - **Track loop termination reason:** The `execute()` method returns an `AgainStopReason` value, letting you know why the
   loop ended.
@@ -94,8 +110,8 @@ You can contribute in one of three ways:
 2. Answer questions or fix bugs on the [issue tracker](https://github.com/vincenzoraco/again/issues).
 3. Contribute new features or update the wiki.
 
-_The code contribution process is not very formal. You just need to make sure that you follow the PSR-0, PSR-1, and
-PSR-2 coding guidelines. Any new code contributions must be accompanied by unit tests where applicable._
+_The code contribution process is not very formal. You just need to make sure that you follow the PER Coding Style
+(enforced by Laravel Pint). Any new code contributions must be accompanied by unit tests where applicable._
 
 ## License
 
