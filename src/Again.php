@@ -7,7 +7,7 @@ namespace VincenzoRaco\Again;
 use Closure;
 use InvalidArgumentException;
 
-class Again
+final class Again
 {
     private float $maxIterations = INF;
 
@@ -22,7 +22,7 @@ class Again
     public static function perform(
         Closure $action,
     ): static {
-        return new static($action);
+        return new self($action);
     }
 
     public function limitTo(
