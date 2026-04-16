@@ -14,7 +14,8 @@
     "require-dev": {
         "jetbrains/phpstorm-attributes": "^1.0",
         "laravel/pint": "^1.0",
-        "pestphp/pest": "^v3.0"
+        "pestphp/pest": "^v3.0",
+        "phpstan/phpstan": "^2.1"
     },
     "autoload": {
         "psr-4": {
@@ -32,12 +33,14 @@
         "check-style": "vendor/bin/pint ./src ./tests --test",
         "pint": "vendor/bin/pint ./src ./tests",
         "fix-style": "vendor/bin/pint ./src ./tests",
-        "test": "vendor/bin/pest"
+        "test": "vendor/bin/pest",
+        "phpstan": "vendor/bin/phpstan analyse"
     },
     "scripts-descriptions": {
         "test": "Run all tests.",
         "check-style": "Run style checks (only dry run - no fixing!).",
-        "fix-style": "Run style checks and fix violations."
+        "fix-style": "Run style checks and fix violations.",
+        "phpstan": "Run static analysis with PHPStan."
     },
     "config": {
         "allow-plugins": {
