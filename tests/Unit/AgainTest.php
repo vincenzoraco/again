@@ -66,11 +66,11 @@ it('allows to get the condition', function () {
 it('allows to get the max iterations', function () {
     $againAction = Again::perform(function () {});
 
-    $this->assertSame(INF, $againAction->getMaxIterations());
+    $this->assertSame(PHP_INT_MAX, $againAction->getMaxIterations());
 
     $againAction->limitTo(2);
 
-    $this->assertSame(2.0, $againAction->getMaxIterations());
+    $this->assertSame(2, $againAction->getMaxIterations());
 });
 
 it('allows to get the iterations reached', function () {

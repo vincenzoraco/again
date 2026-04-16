@@ -9,7 +9,7 @@ use InvalidArgumentException;
 
 final class Again
 {
-    private float $maxIterations = INF;
+    private int $maxIterations = PHP_INT_MAX;
 
     private int $iteration = 0;
 
@@ -28,7 +28,7 @@ final class Again
     public function limitTo(
         int $maxIterations,
     ): static {
-        $this->maxIterations = (float) $maxIterations;
+        $this->maxIterations = $maxIterations;
 
         return $this;
     }
@@ -74,7 +74,7 @@ final class Again
 
     public function isMaxIterationsInfinite(): bool
     {
-        return $this->getMaxIterations() === INF;
+        return $this->getMaxIterations() === PHP_INT_MAX;
     }
 
     public function getCondition(): ?Closure
@@ -82,7 +82,7 @@ final class Again
         return $this->condition;
     }
 
-    public function getMaxIterations(): float
+    public function getMaxIterations(): int
     {
         return $this->maxIterations;
     }
