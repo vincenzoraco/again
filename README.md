@@ -4,7 +4,7 @@ A handy utility package that lets you write loops in a declarative way and avoid
 
 ## Requirements
 
-- PHP 8.2 or higher
+- PHP 8.3 or higher
 
 ## Installing
 
