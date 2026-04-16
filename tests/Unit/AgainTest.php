@@ -97,6 +97,18 @@ it('throws when limitTo receives -5', function () {
         ->limitTo(-5);
 });
 
+it('prevents execute() from being called more than once', function () {
+    $again = Again::perform(function () {})
+        ->limitTo(3);
+
+    $again->execute();
+
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('execute() can only be called once per instance');
+
+    $again->execute();
+});
+
 it('allows to get the iterations reached', function () {
     $againAction = Again::perform(function () {})
         ->limitTo(3)
@@ -107,4 +119,81 @@ it('allows to get the iterations reached', function () {
     $this->assertSame(AgainStopReason::CONDITION_MET, $stopReason);
 
     $this->assertSame(2, $againAction->getIterations());
+});
+
+it('executes the action exactly once when limitTo is 1', function () {
+    $counter = 0;
+
+    $stopReason = Again::perform(function () use (&$counter) {
+        $counter++;
+    })->limitTo(1)->execute();
+
+    $this->assertSame(AgainStopReason::MAX_ITERATIONS_REACHED, $stopReason);
+    $this->assertSame(1, $counter);
+});
+
+it('stops when condition changes mid-execution', function () {
+    $flag = true;
+
+    $again = Again::perform(function (int $i) use (&$flag) {
+        if ($i === 2) {
+            $flag = false;
+        }
+    })
+        ->limitTo(10)
+        ->until(function () use (&$flag) {
+            return $flag;
+        });
+
+    $stopReason = $again->execute();
+
+    $this->assertSame(AgainStopReason::CONDITION_MET, $stopReason);
+    $this->assertSame(3, $again->getIterations());
+});
+
+it('propagates exceptions thrown inside the action', function () {
+    $this->expectException(RuntimeException::class);
+    $this->expectExceptionMessage('action failed');
+
+    Again::perform(function () {
+        throw new RuntimeException('action failed');
+    })->limitTo(3)->execute();
+});
+
+it('stops a condition-only loop when condition returns false', function () {
+    $stopReason = Again::perform(function () {})
+        ->until(fn (int $i) => $i < 4)
+        ->execute();
+
+    $this->assertSame(AgainStopReason::CONDITION_MET, $stopReason);
+});
+
+it('stops a limit-only loop at the given limit', function () {
+    $counter = 0;
+
+    $stopReason = Again::perform(function () use (&$counter) {
+        $counter++;
+    })->limitTo(5)->execute();
+
+    $this->assertSame(AgainStopReason::MAX_ITERATIONS_REACHED, $stopReason);
+    $this->assertSame(5, $counter);
+});
+
+it('passes the correct iteration index to action and condition', function () {
+    $actionIndices = [];
+    $conditionIndices = [];
+
+    Again::perform(function (int $i) use (&$actionIndices) {
+        $actionIndices[] = $i;
+    })
+        ->limitTo(4)
+        ->until(function (int $i) use (&$conditionIndices) {
+            $conditionIndices[] = $i;
+
+            return true;
+        })
+        ->execute();
+
+    $this->assertSame([0, 1, 2, 3], $actionIndices);
+    $this->assertSame([0, 1, 2, 3], $conditionIndices);
 });
