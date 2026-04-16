@@ -73,6 +73,30 @@ it('allows to get the max iterations', function () {
     $this->assertSame(2, $againAction->getMaxIterations());
 });
 
+it('throws when limitTo receives 0', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('The maximum number of iterations must be at least 1');
+
+    Again::perform(function () {})
+        ->limitTo(0);
+});
+
+it('throws when limitTo receives -1', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('The maximum number of iterations must be at least 1');
+
+    Again::perform(function () {})
+        ->limitTo(-1);
+});
+
+it('throws when limitTo receives -5', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('The maximum number of iterations must be at least 1');
+
+    Again::perform(function () {})
+        ->limitTo(-5);
+});
+
 it('allows to get the iterations reached', function () {
     $againAction = Again::perform(function () {})
         ->limitTo(3)

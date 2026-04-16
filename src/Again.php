@@ -28,6 +28,12 @@ final class Again
     public function limitTo(
         int $maxIterations,
     ): static {
+        if ($maxIterations < 1) {
+            throw new InvalidArgumentException(
+                'The maximum number of iterations must be at least 1'
+            );
+        }
+
         $this->maxIterations = $maxIterations;
 
         return $this;
