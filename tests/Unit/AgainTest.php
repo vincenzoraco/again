@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use VincenzoRaco\Again\Again;
 use VincenzoRaco\Again\AgainStopReason;
 
@@ -64,11 +66,35 @@ it('allows to get the condition', function () {
 it('allows to get the max iterations', function () {
     $againAction = Again::perform(function () {});
 
-    $this->assertSame(INF, $againAction->getMaxIterations());
+    $this->assertSame(PHP_INT_MAX, $againAction->getMaxIterations());
 
     $againAction->limitTo(2);
 
-    $this->assertSame(2.0, $againAction->getMaxIterations());
+    $this->assertSame(2, $againAction->getMaxIterations());
+});
+
+it('throws when limitTo receives 0', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('The maximum number of iterations must be at least 1');
+
+    Again::perform(function () {})
+        ->limitTo(0);
+});
+
+it('throws when limitTo receives -1', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('The maximum number of iterations must be at least 1');
+
+    Again::perform(function () {})
+        ->limitTo(-1);
+});
+
+it('throws when limitTo receives -5', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('The maximum number of iterations must be at least 1');
+
+    Again::perform(function () {})
+        ->limitTo(-5);
 });
 
 it('allows to get the iterations reached', function () {

@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace VincenzoRaco\Again;
 
 use Closure;
 use InvalidArgumentException;
 
-class Again
+final class Again
 {
-    private float $maxIterations = INF;
+    private int $maxIterations = PHP_INT_MAX;
 
     private int $iteration = 0;
 
@@ -20,13 +22,19 @@ class Again
     public static function perform(
         Closure $action,
     ): static {
-        return new static($action);
+        return new self($action);
     }
 
     public function limitTo(
         int $maxIterations,
     ): static {
-        $this->maxIterations = (float) $maxIterations;
+        if ($maxIterations < 1) {
+            throw new InvalidArgumentException(
+                'The maximum number of iterations must be at least 1'
+            );
+        }
+
+        $this->maxIterations = $maxIterations;
 
         return $this;
     }
@@ -72,7 +80,7 @@ class Again
 
     public function isMaxIterationsInfinite(): bool
     {
-        return $this->getMaxIterations() === INF;
+        return $this->getMaxIterations() === PHP_INT_MAX;
     }
 
     public function getCondition(): ?Closure
@@ -80,7 +88,7 @@ class Again
         return $this->condition;
     }
 
-    public function getMaxIterations(): float
+    public function getMaxIterations(): int
     {
         return $this->maxIterations;
     }
